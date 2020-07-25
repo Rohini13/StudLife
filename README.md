@@ -1,2 +1,2 @@
 # StudLife
-A django based web app meant to automate time consuming tasks
+A Django based web application meant to automate the time consuming tasks in college.
