@@ -18,11 +18,14 @@ class UserFormView(View):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
-        userGroup = Group.objects.get(user=user).name
-        if user is not None and userGroup == 'canteen_managers':
-            login(request, user)
-            return redirect('canteen_logged_in')
-        else:
+        try:
+            userGroup = Group.objects.get(user=user).name
+            if user is not None and userGroup == 'canteen_managers':
+                login(request, user)
+                return redirect('canteen_logged_in')
+            else:
+                return render(request, self.template_name)
+        except Group.DoesNotExist:
             return render(request, self.template_name)
 
 
@@ -73,5 +76,24 @@ def canteen_logout(request):
 
 
 def canteen_edit_profile(request):
-    return render(request, 'canteen/canteen_edit_profile_page.html')
+    user = User.objects.get(username='canteen_manager@iiita')
+    if request.method == 'GET':
+        return render(request, 'canteen/canteen_edit_profile_page.html', {'user': user})
+    else:
+        if request.POST.get('first_name'):
+            user.first_name = request.POST.get('first_name')
+            user.save()
+        if request.POST.get('last_name'):
+            user.last_name = request.POST.get('last_name')
+            user.save()
+        if request.POST.get('email'):
+            user.email = request.POST.get('email')
+            user.save()
+        if request.POST.get('password'):
+            password = request.POST.get('password')
+            user.set_password(password)
+            user.save()
+        return redirect('canteen_logged_in')
+
+
 

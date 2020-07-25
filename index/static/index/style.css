@@ -186,7 +186,6 @@ iframe {
 
 
 .mu-send-msg-btn {
-	color: #555;
 	font-size: 14px;
 	font-weight: 400;
 	letter-spacing: 1px;
@@ -239,7 +238,6 @@ iframe {
 /*--------------------*/
 
 #mu-hero {
-	background-image: url("assets/images/head-featured-bg.jpg");
 	display: inline;
 	float: left;
 	width: 100%;
@@ -313,7 +311,6 @@ iframe {
 .mu-hero-top-info ul li {
 	list-style: none;
 	color: #fff;
-	font-size: 18px;
 	display: inline-block;
 	padding: 0 8px;
 	border-left: 1px solid #f8f8f8;
@@ -520,7 +517,6 @@ iframe {
 
 
 #mu-video {
-	background-image: url("assets/images/about-video-bg.jpeg");
 	background-attachment: fixed;
 	background-position: center center;
 	-webkit-background-size: cover;
@@ -657,7 +653,6 @@ iframe {
 /*--------------------*/
 
 #mu-testimonials {
-	background-image: url("assets/images/testimonials-bg.jpeg");
 	background-position: center center;
 	background-size: cover;
 	background-attachment: fixed;

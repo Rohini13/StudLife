@@ -3,6 +3,8 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
+	  <link rel = "icon" href ="{% static 'canteen/images/logo.png' %}" type = "image/x-icon"> 
+
   <title>StudLife</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -314,6 +316,15 @@
           pointer-events: none;
         }
       }
+    a.dashboard{
+        color: white;
+        display: block;
+    }
+    a.dashboard:hover{
+        color: white;
+        display: block;
+        text-decoration: none;
+    }
 </style>
 <body>
 <!-- partial:index.partial.html -->
@@ -321,19 +332,20 @@
 	<div class="smartphone-menu-trigger"></div>
   <header class="avatar">
    
-    <img src={% static 'canteen/images/res.webp' %} />
+    <img src="{% static 'canteen/images/res.webp' %}" />
    
     
- <br><br>
-    <h4>Canteen Manager</h4>
+ 
+    <h2>Canteen</h2>
   </header>
 	<ul>
-    <li tabindex="0" class="icon-home"><span>Home</span></li>
-    <li tabindex="0" class="icon-dashboard"><span>Dashboard</span></li>
-    <li tabindex="0" class="icon-profile"><span>Edit Profile</span></li>
-    <li tabindex="0" class="icon-customers"><span>About</span></li>
-    <li tabindex="0" class="icon-users"><span>Developers</span></li>
-    <li tabindex="0" class="icon-signo"><span>Sign Out</span></li>
+    <a class="dashboard" href="{% url 'index' %}">
+            <li tabindex="0" class="icon-home"><span>Home</span></li></a>
+            <a class="dashboard" href="{% url 'canteen_edit_profile' %}"><li tabindex="0" class="icon-profile"><span>Edit Profile</span></li></a>
+            <a class="dashboard" href="{% url 'about' %}"><li tabindex="0" class="icon-customers"><span>About</span></li></a>
+            <a class="dashboard" href="{% url 'developers' %}"><li tabindex="0" class="icon-users"><span>Developers</span></li></a>
+            <a class="dashboard" href="{% url 'canteen_logout' %}"><li tabindex="0" class="icon-signo"><span>Sign Out</span></li></a>
+
   </ul>
 </nav>
 

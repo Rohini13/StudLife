@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-{%  load static %}
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel = "icon" href ="{% static 'student/images/logo.png' %}" type = "image/x-icon"> 
     <title>book_appointment</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Cookie|Lobster|Satisfy&display=swap" rel="stylesheet">
 </head>
 <style>
     body {
-        background: linear-gradient(to bottom left,rgb(188, 241, 188),rgb(248, 248, 133), rgb(248, 204, 123),rgb(248, 129, 129),rgb(255, 120, 143),rgb(252, 136, 252));
+       /* background: linear-gradient(to bottom left,rgb(188, 241, 188),rgb(248, 248, 133), rgb(248, 204, 123),rgb(248, 129, 129),rgb(255, 120, 143),rgb(252, 136, 252));*/
+       background: linear-gradient(to right, #16d6d9, #96cc29);
         margin: 0;
         
         font-family: "Open Sans", Helvetica Neue, Helvetica, Arial, sans-serif;
@@ -183,6 +185,9 @@
       .menu ul li.icon-signo {
         background-image: url("http://www.entypo.com/images/log-out.svg");
       }
+          .menu ul li.icon-arrow-left {
+        background-image: url("http://www.entypo.com/images//arrow-left.svg");
+    }
       .menu ul li:hover {
         background-color: rgba(0, 0, 0, 0.5);
       }
@@ -298,22 +303,34 @@
         .menu:focus .smartphone-menu-trigger {
           pointer-events: none;
         }
-      }  
+      }
+    a.dashboard{
+        display: block;
+        color: white;
+    }
+    a.dashboard:hover{
+        display: block;
+        color: white;
+        text-decoration: none;
+    }
+
 </style>
 <body>
     <nav class="menu" tabindex="0">
         <div class="smartphone-menu-trigger"></div>
       <header class="avatar">
-        <img src="{%  static 'student/images/01.jpg'%}" />
+        <img src="{% static 'student/images/01.jpg' %}" />
         <h2>{{ user.username }}</h2>
       </header>
         <ul>
-        <li tabindex="0" class="icon-home"><span>Home</span></li>
-        <li tabindex="0" class="icon-dashboard"><span>Dashboard</span></li>
-        <li tabindex="0" class="icon-profile"><span>Edit Profile</span></li>
-        <li tabindex="0" class="icon-customers"><span>About</span></li>
-        <li tabindex="0" class="icon-users"><span>Developers</span></li>
-        <li tabindex="0" class="icon-signo"><span>Sign Out</span></li>
+            <li tabindex="0" class="icon-arrow-left"><a class="dashboard" href="{% url 'logged_in' user.id %}"><span>Back to profile</span></a></li>
+        <a class="dashboard" href="{% url 'index' %}">
+            <li tabindex="0" class="icon-home"><span>Home</span></li></a>
+            <a class="dashboard" href="{% url 'student_edit_profile' user.id %}"><li tabindex="0" class="icon-profile"><span>Edit Profile</span></li></a>
+            <a class="dashboard" href="{% url 'about' %}"><li tabindex="0" class="icon-customers"><span>About</span></li></a>
+            <a class="dashboard" href="{% url 'developers' %}"><li tabindex="0" class="icon-users"><span>Developers</span></li></a>
+            <a class="dashboard" href="{% url 'logout_student' user.id %}"><li tabindex="0" class="icon-signo"><span>Sign Out</span></li></a>
+
       </ul>
     </nav>
     <main>

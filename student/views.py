@@ -12,6 +12,9 @@ from .models import Files, Order
 from django.contrib.auth import logout
 from canteen.models import Profile3
 from canteen.models import Food_item
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 class UserFormView(View):
@@ -25,11 +28,14 @@ class UserFormView(View):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
-        userGroup = Group.objects.get(user=user).name
-        if user is not None and userGroup=='students':
-            login(request, user)
-            return redirect('logged_in', user.id)
-        else:
+        try:
+            userGroup = Group.objects.get(user=user).name
+            if user is not None and userGroup=='students':
+                login(request, user)
+                return redirect('logged_in', user.id)
+            else:
+                return render(request, self.template_name)
+        except Group.DoesNotExist:
             return render(request, self.template_name)
 
 
@@ -136,6 +142,7 @@ def pdf(request,user_id):
     permit = Granted_outpasses.objects.get(username=user.username)
     go=permit.full_name
     params = {
+        'username' :permit.username,
         'full_name' : go,
         'going_to' : permit.destination,
         'vehicle': permit.vehicle,
@@ -204,6 +211,118 @@ def pdf_appointment(request,user_id):
 def logout_student(request,user_id):
     logout(request)
     return redirect('index')
+
+
+
+
+
+def order_food(request, user_id):
+    user = User.objects.get(pk=user_id)
+    try:
+        profile = Profile3.objects.get(username=user.username)
+        if profile.order_status == -1:
+            return redirect('fav', user_id)
+        elif profile.order_status == 0:
+            return render(request, 'student/order_requested.html', {'user':user})
+        elif profile.order_status == 1:
+            return render(request, 'student/order_preparing.html', {'user':user})
+        elif profile.order_status == 2:
+            return render(request, 'student/order_cancelled.html', {'user':user})
+        elif profile.order_status == 3:
+            return render(request, 'student/order_prepared.html', {'user':user})
+    except Profile3.DoesNotExist:
+        return redirect('fav', user_id)
+
+
+def add_food(request, user_id, food_id, val):
+    user = User.objects.get(pk=user_id)
+    try:
+        order = Order.objects.get(food_id=food_id, username=user.username)
+        order.quantity = order.quantity + 1
+        order.save()
+    except Order.DoesNotExist:
+        try:
+            profile = Profile3.objects.get(username=user.username)
+        except Profile3.DoesNotExist:
+            profile = Profile3()
+            profile.username = user.username
+            profile.order_status = -1
+            profile.save()
+        finally:
+            order = Order()
+            order.username=user.username
+            order.food_id=food_id
+            order.quantity=1
+            order.save()
+    finally:
+        if val==1:
+            return redirect('fav',user.id)
+        elif val==2:
+            return redirect('fast', user.id)
+        elif val==3:
+            return redirect('maincourse', user.id)
+        else:
+            return redirect('refreshment', user.id)
+
+
+def remove_food(request, user_id, food_id, val):
+    user = User.objects.get(pk=user_id)
+    try:
+        order = Order.objects.get(food_id=food_id, username=user.username)
+        order.quantity = order.quantity - 1
+        if order.quantity==0:
+            order.delete()
+        else:
+            order.save()
+        flag = 0;
+        all_orders = Order.objects.all()
+        for order in all_orders:
+            if order.username==user.username:
+                flag=1
+                break
+        if flag==0:
+            obj = Profile3.objects.get(username=user.username)
+            obj.delete()
+    except Order.DoesNotExist:
+        user=User.objects.get(pk=user_id)
+    finally:
+        if val == 1:
+            return redirect('fav', user.id)
+        elif val == 2:
+            return redirect('fast', user.id)
+        elif val == 3:
+            return redirect('maincourse', user.id)
+        else:
+            return redirect('refreshment', user.id)
+
+
+def back_order(request, user_id):
+    user = User.objects.get(pk=user_id)
+    profile = Profile3.objects.get(username=user.username)
+    profile.delete()
+    orders = Order.objects.all()
+    for order in orders:
+        if order.username == user.username:
+            order.delete()
+    return redirect('fav', user.id)
+
+
+def cart(request, user_id):
+    user = User.objects.get(pk=user_id)
+    food = Order.objects.filter(username=user.username)
+    food_item = Food_item.objects.all()
+    if not food:
+        return render(request, 'student/cart_empty.html', {'user':user})
+    else:
+        return render(request, 'student/cart.html', {'user':user, 'food':food, 'food_item':food_item})
+
+
+def place_order(request, user_id):
+    user = User.objects.get(pk=user_id)
+    profile = Profile3.objects.get(username=user.username)
+    profile.order_status=0
+    profile.save()
+    return render(request,'student/order_requested.html', {'user':user})
 
 
 def student_edit_profile(request, user_id):
@@ -318,3 +437,20 @@ def place_order(request, user_id):
     profile.order_status=0
     profile.save()
     return render(request,'student/order_requested.html', {'user':user})
+    if request.method == 'GET':
+        return render(request, 'student/edit_profile_page.html', {'user': user})
+    else:
+        if request.POST.get('first_name'):
+            user.first_name=request.POST.get('first_name')
+            user.save()
+        if request.POST.get('last_name'):
+            user.last_name=request.POST.get('last_name')
+            user.save()
+        if request.POST.get('email'):
+            user.email=request.POST.get('email')
+            user.save()
+        if request.POST.get('password'):
+            password=request.POST.get('password')
+            user.set_password(password)
+            user.save()
+        return redirect('logged_in', user_id)

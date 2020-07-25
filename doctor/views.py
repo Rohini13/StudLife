@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View
 from django.contrib.auth.models import User, Group
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from .models import Profile2, Granted_appointment
 
 class UserFormView(View):
@@ -15,11 +15,14 @@ class UserFormView(View):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
-        userGroup = Group.objects.get(user=user).name
-        if user is not None and userGroup == 'doctors':
-            login(request, user)
-            return redirect('doctor_logged_in')
-        else:
+        try:
+            userGroup = Group.objects.get(user=user).name
+            if user is not None and userGroup == 'doctors':
+                login(request, user)
+                return redirect('doctor_logged_in')
+            else:
+                return render(request, self.template_name)
+        except Group.DoesNotExist:
             return render(request, self.template_name)
 
 
@@ -27,7 +30,7 @@ def logged_in(request):
     all_profiles = Profile2.objects.all()
     return render(request, 'doctor/doctor_dashboard.html', {'all_profiles': all_profiles})
 
-def show(request, user_id):
+def show(request):
     all_profiles = Profile2.objects.all()
     return render(request,'doctor/doctor_page.html', {'all_profiles': all_profiles})
 
@@ -48,9 +51,39 @@ def individual_request(request, profile_id):
             user.student.appointments = 2
             user.save()
             profile.delete()
-            return redirect('doctor_logged_in')
+            return redirect('show')
         else:
             user.student.appointments = 3
             user.save()
             profile.delete()
-            return redirect('doctor_logged_in')
+            return redirect('show')
+
+
+def doctor_logout(request):
+    logout(request)
+    return redirect('index')
+
+
+def doctor_edit_profile(request):
+    user = User.objects.get(username='executive.hc@iiita')
+    if request.method == 'GET':
+        return render(request, 'doctor/doctor_edit_profile.html', {'user': user})
+    else:
+        if request.POST.get('first_name'):
+            user.first_name = request.POST.get('first_name')
+            user.save()
+        if request.POST.get('last_name'):
+            user.last_name = request.POST.get('last_name')
+            user.save()
+        if request.POST.get('email'):
+            user.email = request.POST.get('email')
+            user.save()
+        if request.POST.get('password'):
+            password = request.POST.get('password')
+            user.set_password(password)
+            user.save()
+        return redirect('doctor_logged_in')
+
+
+def doctor_view_schedule(request):
+    return render(request, 'doctor/schedule.html')
