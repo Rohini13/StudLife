@@ -325,10 +325,6 @@ def place_order(request, user_id):
     return render(request,'student/order_requested.html', {'user':user})
 
 
-def student_edit_profile(request, user_id):
-    user = User.objects.get(pk=user_id)
-    return render(request, 'student/edit_profile_page.html', {'user': user})
-
 
 def order_food(request, user_id):
     user = User.objects.get(pk=user_id)
@@ -437,6 +433,9 @@ def place_order(request, user_id):
     profile.order_status=0
     profile.save()
     return render(request,'student/order_requested.html', {'user':user})
+
+def student_edit_profile(request, user_id):
+    user = User.objects.get(pk=user_id)
     if request.method == 'GET':
         return render(request, 'student/edit_profile_page.html', {'user': user})
     else:
